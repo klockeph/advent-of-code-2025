@@ -1,9 +1,6 @@
 #lang racket
 
-(define (read-input-lines filename)
-  (with-input-from-file filename
-    (lambda ()
-      (port->lines (current-input-port)))))
+(require "common.rkt")
 
 (define input-data (read-input-lines "inputs\\day01.txt"))
 
