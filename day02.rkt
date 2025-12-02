@@ -2,22 +2,6 @@
 
 (require "common.rkt")
 
-(define test-input '("11-22"
-                     "95-115"
-                     "998-1012"
-                     "1188511880-1188511890"
-                     "222220-222224"
-                     "1698522-1698528"
-                     "446443-446449"
-                     "38593856-38593862"
-                     "565653-565659"
-                     "824824821-824824827"
-                     "2121212118-2121212124"
-                     ))
-
-
-;;(define input test-input)
-
 (define input (string-split (first (read-input-lines "inputs\\day02.txt")) ","))
 
 (define (get-range str)
@@ -26,27 +10,43 @@
   (define b (string->number (second l)))
   (range a (+ b 1)))
 
-(define (is-invalid id-number)
+(define (repeating-pattern? pattern whole-string)
+  (define p-length (string-length pattern))
+  (define s-length (string-length whole-string))
+  (if (not (= (modulo s-length p-length) 0)) #f
+      (for/and ([i (range 1 (/ s-length p-length))])
+        (string=? (substring whole-string (* i p-length) (* (+ i 1) p-length)) pattern)
+        )
+      ))
+
+(define (sum-invalids-curried check-fn)
+  (lambda (range-string)
+    (define range (get-range range-string))
+    (for/sum ([id-number range]
+              #:when (check-fn id-number))
+      id-number
+      )
+    )
+  )
+
+(define (is-invalid-1 id-number)
   (define s (number->string id-number))
   (define len (string-length s))
-  (if (= (modulo len 2) 1) #f
-      (let ([h (/ len 2)])
-        (let ([l (substring s 0 h)])
-          (let ([r (substring s h len)])
-            (string=? l r))))
-      )
+  (and (= (modulo len 2) 0) (repeating-pattern? (substring s 0 (quotient len 2)) s)))
+
+(define (solve invalid-check)
+  (for/sum ([i input]) ((sum-invalids-curried invalid-check) i))
   )
 
-(define (sum-invalids range-string acc)
-  (define range (get-range range-string))
-  (+ acc (for/sum ([id-number range]
-                   #:when (is-invalid id-number))
-           id-number
-           ))
-  )
+(define solution1 (solve is-invalid-1))
+(printf "solution1: ~a\n" solution1)
 
-(define solution1
-  (foldl sum-invalids 0 input)
-  )
 
-(display solution1)
+(define (invalid-2? id-number)
+  (define s (number->string id-number))
+  (for/or ([p-len (range 1 (string-length s))])
+    (let ([pattern (substring s 0 p-len)])
+      (repeating-pattern? pattern s))))
+
+(define solution2 (solve invalid-2?))
+(printf "solution2: ~a\n" solution2)
