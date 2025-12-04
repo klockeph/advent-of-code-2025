@@ -13,17 +13,14 @@
     (for ([char line]
           [x (range w)]
           #:when (char=? char #\@))
-      (set-add! s (cons x y))
-      ))
+      (set-add! s (cons x y))))
   s)
 
 (define (get-neighbors p)
   (for*/list ([dx '(-1 0 1)]
               [dy '(-1 0 1)]
               #:unless (and (= 0 dx) (= 0 dy)))
-    (cons (+ dx (car p)) (+ dy (cdr p)))
-    )
-  )
+    (cons (+ dx (car p)) (+ dy (cdr p)))))
 
 (define (get-valid-neighbors p s)
   (define n (get-neighbors p))
