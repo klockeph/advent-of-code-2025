@@ -7,7 +7,7 @@
 (provide read-input-lines)
 
 (define (argmax-index f lst)
-  (define-values (bi _mv _ci)
+  (define-values (bi mv _ci)
     (for/fold ([best-i 0]
                [max-val (f (first lst))]
                [curr-i 0]
@@ -18,5 +18,5 @@
             (values curr-i current-val (+ curr-i 1))
             (values best-i max-val (+ curr-i 1)))))
     )
-  bi)
+  (cons mv bi))
 (provide argmax-index)

@@ -4,26 +4,26 @@
 
 (define input (read-input-lines "inputs\\day03.txt"))
 
-(define (max-num digits)
-  (define digits-length (length digits))
-  (define first-digit-pos (argmax-index identity (take digits (- digits-length 1))))
-  (define second-digit-pos (+ (argmax-index identity (drop digits (+ first-digit-pos 1))) first-digit-pos 1))
-  (define first-digit (list-ref digits first-digit-pos))
-  (define second-digit (list-ref digits second-digit-pos))
-  (+ (* 10 first-digit) second-digit)
-   )
+(define (digit-add num d) (+ (* 10 num) d))
+
+(define (max-num count digits [acc 0])
+  (cond
+    [(= count 1) (digit-add acc (foldl max 0 digits))]
+    [else
+      (define digits-length (length digits))
+      (define curr-digit-i (argmax-index identity (take digits (- digits-length (- count 1)))))
+      (max-num (- count 1) (drop digits (+ (cdr curr-digit-i) 1)) (digit-add acc (car curr-digit-i)))]))
 
 (define (digit-value digit-char)
   (- (char->integer digit-char)
      (char->integer #\0)))
 
-(define (max-joltage line)
-  (max-num (map digit-value (string->list line)))
+(define (max-joltage line count)
+  (max-num count (map digit-value (string->list line)))
    )
 
-(define solution1
-  (for/sum ([l input]) (max-joltage l)))
+(define (solve count)
+  (for/sum ([l input]) (max-joltage l count)))
 
-(printf "solution1: ~a\n" solution1)
-
-(define t (map max-joltage input))
+(printf "solution1: ~a\n" (solve 2))
+(printf "solution2: ~a\n" (solve 12))
