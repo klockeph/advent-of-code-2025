@@ -20,3 +20,15 @@
     )
   (cons mv bi))
 (provide argmax-index)
+
+;; Calls (handler (x y) char) for each grid position.
+;; Yields no result, handler needs to track it.
+(define (parse-grid input handler)
+  (define h (length input))
+  (define w (string-length (first input)))
+  (for ([line input] [y (range h)])
+    (for ([char line]
+          [x (range w)])
+      (handler (cons x y) char)
+      )))
+(provide parse-grid)
